@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+    <changeSet id="create_voteus_db_user" author="Nerdi">
+        <sqlFile path="createVoteusUser.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="create_role" author="Nerdi">
+        <createTable tableName="role">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="varchar(40)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="insert_roles" author="Nerdi">
+        <insert tableName="role">
+            <column name="id" value="1"/>
+            <column name="name" value="USER"/>
+        </insert>
+        <insert tableName="role">
+            <column name="id" value="2"/>
+            <column name="name" value="ADMIN"/>
+        </insert>
+    </changeSet>
+    <changeSet id="create_department_table" author="Nerdi">
+        <createTable tableName="department">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="varchar(40)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create_voting_table" author="Nerdi">
+        <createTable tableName="voting">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="start_date_time" type="datetime">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="end_date_time" type="datetime">
+                <constraints unique="false" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create_user_credential_table" author="Nerdi">
+        <createTable tableName="user_credential">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="username" type="VARCHAR(20)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create_voteus_user_table" author="Nerdi">
+        <createTable tableName="voteus_user">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="username" type="varchar(20)">
+                <constraints unique="false" nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_user_role" references="role(id)"/>
+            </column>
+            <column name="department_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_user_department" references="department(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create_candidate_table" author="Nerdi">
+        <createTable tableName="candidate">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="description" type="text">
+                <constraints nullable="true" unique="false"/>
+            </column>
+            <column name="voting_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_candidate_voting" references="voting(id)"/>
+            </column>
+            <column name="department_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_candidate_department" references="department(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="vote" author="Nerdi">
+        <createTable tableName="vote">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="vote_by_user_id" type="bigint">
+                <constraints unique="false" nullable="false" foreignKeyName="fk_user_vote" references="voteus_user(id)"/>
+            </column>
+            <column name="candidate_id" type="bigint">
+                <constraints unique="false" nullable="false" foreignKeyName="fk_candidate_vote" references="candidate(id)"/>
+            </column>
+            <column name="voting_id" type="bigint">
+                <constraints unique="false" nullable="false" foreignKeyName="fk_voting_vote" references="voting(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="create_voting_winner_table" author="Nerdi">
+        <createTable tableName="voting_winner">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" unique="true"/>
+            </column>
+            <column name="voting_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_voting_winner_voting" references="voting(id)"/>
+            </column>
+            <column name="candidate_id" type="bigint">
+                <constraints nullable="false" unique="false" foreignKeyName="fk_voting_winner_candidate" references="candidate(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
